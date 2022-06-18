@@ -4,20 +4,85 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+      integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+      crossorigin="anonymous"
+    />
     <title>Back-End Calculator</title>
 
     <style>
-      .container {
-        max-width: 1500px;
-        background: red;
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      .calculator {
+        width: 410px;
         margin: 0 auto;
+        background: rgb(209, 201, 201);
+        border-radius: 5px;
+      }
+
+      .container {
+        padding-top: 2rem;
+      }
+
+      .result-display {
+        width: 100%;
+        height: 8rem;
+        border: 10px solid rgb(209, 201, 201);
+        border-radius: 5px;
+      }
+
+      .keyboard {
+        display: grid;
+        align-content: center;
+        justify-content: center;
+
+        grid-template-columns: repeat(4, 100px);
+        grid-template-rows: repeat(5, 100px);
+
+        border-radius: 5px;
+      }
+
+      .keyboard button {
+        margin: 5px;
+        font-size: 2rem;
       }
     </style>
   </head>
   <body>
     <main>
       <div class="container">
-        <h1 class="teste">HELLO WORLD!!!</h1>
+        <div class="calculator">
+          <input type="text" class="result-display" readonly />
+          <div class="keyboard">
+            <button type="button" class="btn btn-info" value="AC">AC</button>
+            <button type="button" class="btn btn-secondary">(</button>
+            <button type="button" class="btn btn-secondary">)</button>
+            <button type="button" class="btn btn-secondary">/</button>
+            <button type="button" class="btn btn-secondary" value="7">7</button>
+            <button type="button" class="btn btn-secondary">8</button>
+            <button type="button" class="btn btn-secondary">9</button>
+            <button type="button" class="btn btn-secondary">X</button>
+            <button type="button" class="btn btn-secondary">4</button>
+            <button type="button" class="btn btn-secondary">5</button>
+            <button type="button" class="btn btn-secondary">6</button>
+            <button type="button" class="btn btn-secondary">-</button>
+            <button type="button" class="btn btn-secondary num1">1</button>
+            <button type="button" class="btn btn-secondary">2</button>
+            <button type="button" class="btn btn-secondary">3</button>
+            <button type="button" class="btn btn-secondary">+</button>
+            <button type="button" class="btn btn-secondary">.</button>
+            <button type="button" class="btn btn-secondary">0</button>
+            <button type="button" class="btn btn-secondary">DEL</button>
+            <button type="button" class="btn btn-info">=</button>
+          </div>
+        </div>
+        <div class="historic">HISTORICO DAS OPERAÇÕES</div>
       </div>
     </main>
   </body>
