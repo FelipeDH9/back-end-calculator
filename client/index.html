@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="pt_BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+      integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://code.jquery.com/jquery-3.6.0.min.js"
+      integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+    <title>Back-End Calculator</title>
+
+    <style>
+      html {
+        min-height: 100%;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        background: linear-gradient(
+          to left top,
+          rgb(255, 255, 255),
+          rgb(32, 32, 32)
+        );
+      }
+
+      .container {
+        padding-top: 2rem;
+      }
+
+      .title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: rgb(23, 162, 184);
+      }
+
+      .calculator {
+        width: 410px;
+        margin: 0 auto;
+        background: rgb(209, 201, 201);
+        border-radius: 5px;
+      }
+
+      .result-display,
+      .expression-display {
+        width: 100%;
+        height: 4rem;
+        border: none;
+        outline: none;
+      }
+
+      .keyboard {
+        display: grid;
+        align-content: center;
+        justify-content: center;
+
+        grid-template-columns: repeat(4, 100px);
+        grid-template-rows: repeat(5, 100px);
+
+        border-radius: 5px;
+      }
+
+      .keyboard button {
+        margin: 5px;
+        font-size: 2rem;
+      }
+
+      .historic {
+        margin-top: 1rem;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="container">
+        <div class="calculator">
+          <div class="form-inputs">
+            <div class="expression-display">
+              <div id="expression"></div>
+            </div>
+            <input type="text" class="result-display" id="result" readonly />
+          </div>
+          <div class="keyboard">
+            <button type="button" class="btn btn-info" id="clear">AC</button>
+            <button type="button" class="btn btn-secondary input" value="(">
+              (
+            </button>
+            <button type="button" class="btn btn-secondary input" value=")">
+              )
+            </button>
+            <button type="button" class="btn btn-secondary input" value="/">
+              /
+            </button>
+            <button type="button" class="btn btn-secondary input" value="7">
+              7
+            </button>
+            <button type="button" class="btn btn-secondary input" value="8">
+              8
+            </button>
+            <button type="button" class="btn btn-secondary input" value="9">
+              9
+            </button>
+            <button type="button" class="btn btn-secondary input" value="*">
+              *
+            </button>
+            <button type="button" class="btn btn-secondary input" value="4">
+              4
+            </button>
+            <button type="button" class="btn btn-secondary input" value="5">
+              5
+            </button>
+            <button type="button" class="btn btn-secondary input" value="6">
+              6
+            </button>
+            <button type="button" class="btn btn-secondary input" value="-">
+              -
+            </button>
+            <button type="button" class="btn btn-secondary input" value="1">
+              1
+            </button>
+            <button type="button" class="btn btn-secondary input" value="2">
+              2
+            </button>
+            <button type="button" class="btn btn-secondary input" value="3">
+              3
+            </button>
+            <button type="button" class="btn btn-secondary input" value="+">
+              +
+            </button>
+            <button type="button" class="btn btn-secondary input" value=".">
+              .
+            </button>
+            <button type="button" class="btn btn-secondary input" value="0">
+              0
+            </button>
+            <button type="button" class="btn btn-secondary" id="delete">
+              DEL
+            </button>
+            <button type="button" class="btn btn-info" id="submit">=</button>
+          </div>
+        </div>
+        <div class="historic">
+          <h3>Histórico de contas</h3>
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">Data</th>
+                <th scope="col">Usuário</th>
+                <th scope="col">Expressão</th>
+                <th scope="col">Resultado</th>
+              </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </body>
+
+  <script>
+    $(document).ready(function () {
+      function calculate() {
+        console.log(String($('#expression').text().trim()))
+        $.ajax({
+          url: 'http://localhost:4731/calculate',
+          type: 'post',
+          data: JSON.stringify({
+            expression: String($('#expression').text().trim())
+          }),
+          dataType: 'json',
+          contentType: 'application/json'
+        })
+          .done(function (data) {
+            $('#result').val(data.result)
+            $('#tbody').append(`
+            <tr>
+                <td>${moment(data.date).format('DD/MM/YYYY hh:mm:ss')}</td>
+                <td>${data.ip}</td>
+                <td>${data.expression}</td>
+                <td>${data.result}</td>
+              </tr>
+            `)
+          })
+          .fail(function (jqXHR, textStatus, msg) {
+            alert(msg)
+          })
+
+        $('#expression').text('')
+        $('#result').val('')
+      }
+
+      $('#submit').on('click', () => calculate())
+
+      $('#clear').on('click', () => {
+        $('#expression').text('')
+        $('#result').val('')
+      })
+
+      $('#delete').on('click', () => {
+        var expression = $('#expression').text().slice(0, -1)
+        $('#expression').text(expression)
+      })
+
+      $('.input').on('click', ({ target }) => {
+        if ($('#expression').text() == 0) {
+          $('#expression').text(target.innerHTML.trim())
+          console.log('te', target.innerHTML.trim())
+          return
+        }
+        $('#expression').text($('#expression').text() + target.innerHTML.trim())
+      })
+    })
+  </script>
+</html>
