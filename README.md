@@ -12,4 +12,4 @@ Inside server directory:
 
 # To use the Calculator
 
-Enter with your name ou userId, that's how we know who did the calculations.
+Enter with your name or userId, that's how we know who did the calculations.
