@@ -48,10 +48,21 @@
       }
 
       .calculator {
+        display: block;
         width: 410px;
         margin: 0 auto;
         background: rgb(209, 201, 201);
         border-radius: 5px;
+      }
+
+      .calculator.hidden {
+        display: none;
+      }
+
+      #userId {
+        margin-bottom: 1rem;
+        font-weight: 600;
+        color: black;
       }
 
       .result-display,
@@ -97,12 +108,34 @@
   <body>
     <main>
       <div class="container">
-        <div class="calculator">
+        <div class="signIn-field">
+          <div class="mb-3">
+            <label for="userName" class="form-label title"
+              >Digite seu nome para usar a calculadora</label
+            >
+            <input
+              type="text"
+              class="form-control"
+              id="userName"
+              placeholder="Nome"
+              autofocus
+            />
+            <button type="button" class="btn btn-info" id="signIn">
+              Entrar
+            </button>
+          </div>
+        </div>
+        <div class="calculator hidden">
           <div class="form-inputs">
             <div class="expression-display">
               <div id="expression"></div>
             </div>
-            <input type="text" class="result-display" id="result" readonly />
+            <input
+              type="text"
+              class="result-display"
+              id="calculation-result"
+              readonly
+            />
           </div>
 
           <div class="keyboard">
@@ -166,7 +199,7 @@
         </div>
         <div class="historic">
           <h3>Histórico de contas</h3>
-          <table class="table">
+          <table class="table" id="calculations-data">
             <thead>
               <tr>
                 <th scope="col">Data</th>
@@ -185,9 +218,15 @@
   <script>
     $(document).ready(function () {
       function calculate() {
+        const inputValue = $('#userName').val()
+
         console.log(String($('#expression').text().trim()))
+        console.log('nome', inputValue)
         $.ajax({
           url: 'http://localhost:4731/calculate',
+          headers: {
+            user_id: getCookie('user_id')
+          },
           type: 'post',
           data: JSON.stringify({
             expression: String($('#expression').text().trim())
@@ -196,29 +235,101 @@
           contentType: 'application/json'
         })
           .done(function (data) {
-            $('#result').val(data.result)
-            $('#tbody').append(`
-            <tr>
-                <td>${moment(data.date).format('DD/MM/YYYY hh:mm:ss')}</td>
-                <td>${data.ip}</td>
-                <td>${data.expression}</td>
-                <td>${data.result}</td>
-              </tr>
-            `)
+            $('#calculation-result').val(String(data.result))
+            getCalculations()
+            $('#teste').append(data.result)
           })
-          .fail(function (jqXHR, textStatus, msg) {
-            alert(msg)
+          .fail(function (error) {
+            alert(error.responseJSON.message)
           })
 
         $('#expression').text('')
-        $('#result').val('')
       }
+
+      function setCookie(cname, cvalue, exdays) {
+        const d = new Date()
+        d.setTime(d.getTime() + exdays * 24 * 60 * 60 * 1000)
+        let expires = 'expires=' + d.toUTCString()
+        document.cookie = cname + '=' + cvalue + ';' + expires + ';path=/'
+      }
+
+      function getCookie(cname) {
+        let name = cname + '='
+        let decodedCookie = decodeURIComponent(document.cookie)
+        let ca = decodedCookie.split(';')
+        for (let i = 0; i < ca.length; i++) {
+          let c = ca[i]
+          while (c.charAt(0) == ' ') {
+            c = c.substring(1)
+          }
+          if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length)
+          }
+        }
+        return ''
+      }
+
+      function signIn() {
+        const inputValue = $('#userName').val()
+        const calculator = $('.calculator')
+
+        $.ajax({
+          url: 'http://localhost:4731/signin-create',
+          type: 'post',
+          data: JSON.stringify({
+            name: String($('#userName').val().trim())
+          }),
+          dataType: 'json',
+          contentType: 'application/json'
+        })
+          .done(function (data) {
+            setCookie('user_id', data.id, 1)
+            getCalculations()
+            calculator.removeClass('hidden')
+          })
+          .fail(function (error) {
+            alert(error.responseJSON.message)
+            calculator.addClass('hidden')
+          })
+      }
+
+      function getCalculations() {
+        $.ajax({
+          url: 'http://localhost:4731/calculations',
+          type: 'get',
+          headers: {
+            user_id: getCookie('user_id')
+          }
+        })
+          .done(function (data) {
+            $('#calculations-data tbody tr').remove()
+            data.map(calculation => {
+              $('#result').val(calculation.result)
+              $('#tbody').append(`
+              <tr>
+                  <td>${moment(calculation.date).format(
+                    'DD/MM/YYYY hh:mm:ss'
+                  )}</td>
+                  <td>${calculation.name}</td>
+                  <td>${calculation.expression}</td>
+                  <td>${calculation.result}</td>
+                </tr>
+              `)
+            })
+          })
+          .fail(function (error) {
+            alert(error.responseJSON.message)
+            calculator.addClass('hidden')
+          })
+      }
+
+      $('#signIn').on('click', () => signIn())
 
       $('#submit').on('click', () => calculate())
 
       $('#clear').on('click', () => {
         $('#expression').text('')
-        $('#result').val('')
+        $('#calculation-result').val('')
       })
 
       $('#delete').on('click', () => {
