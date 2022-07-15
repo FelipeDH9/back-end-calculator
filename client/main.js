@@ -63,6 +63,10 @@ $(document).ready(function () {
       contentType: 'application/json'
     })
       .done(function (data) {
+        $('#user-name').text(inputValue)
+        $('#expression').text('')
+        $('#calculation-result').val('')
+
         setCookie('user_id', data.id, 1)
         getCalculations()
         calculator.removeClass('hidden')
@@ -84,11 +88,11 @@ $(document).ready(function () {
       .done(function (data) {
         $('#calculations-data tbody tr').remove()
         data.map(calculation => {
+          const testando = new Date(calculation.created_at)
           $('#result').val(calculation.result)
           $('#tbody').append(`
           <tr>
-              <td>${moment(calculation.date).format('DD/MM/YYYY hh:mm:ss')}</td>
-              <td>${calculation.name}</td>
+              <td>${testando.toLocaleString()}</td>
               <td>${calculation.expression}</td>
               <td>${calculation.result}</td>
             </tr>

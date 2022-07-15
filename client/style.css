@@ -82,3 +82,14 @@ body {
 .historic {
   margin-top: 1rem;
 }
+
+.mb-3 button{
+  margin-top: 1rem;
+}
+
+#user-name{
+  font-size: 1.75rem;
+  text-transform: capitalize;
+  /* color: #000; */
+  font-weight: 500;
+}
