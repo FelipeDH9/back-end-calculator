@@ -17,7 +17,6 @@ $(document).ready(function () {
       .done(function (data) {
         $('#calculation-result').val(String(data.result))
         getCalculations()
-        $('#teste').append(data.result)
       })
       .fail(function (error) {
         alert(error.responseJSON.message)
@@ -88,11 +87,11 @@ $(document).ready(function () {
       .done(function (data) {
         $('#calculations-data tbody tr').remove()
         data.map(calculation => {
-          const testando = new Date(calculation.created_at)
+          const calculationDate = new Date(calculation.created_at)
           $('#result').val(calculation.result)
           $('#tbody').append(`
           <tr>
-              <td>${testando.toLocaleString()}</td>
+              <td>${calculationDate.toLocaleString()}</td>
               <td>${calculation.expression}</td>
               <td>${calculation.result}</td>
             </tr>
